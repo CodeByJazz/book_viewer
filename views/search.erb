@@ -1,0 +1,29 @@
+<h2 class="content-subhead">Search</h2>
+
+<form action="/search" method="get">
+  <input name="query" value=<%= @search_terms%>>
+  <button type="submit">Search</button>
+</form>
+
+<% if @search_terms.nil? %>
+<% elsif !@results.empty? %>
+<h2 class="content-subhead">Results for '<%= @search_terms %>'</h2>
+<ul>
+  <% @results.each do |result| %>
+    <li><%= result[0] %></li>
+    <ul>
+    <% result[2].split("\n\n").each_with_index do |paragraph, index| %>
+      <% if paragraph.include?(@search_terms) %>
+       <li>
+       <a href="/chapters/<%= result[1] + 1 %>#paragraph<%= index %>">
+       <%= bold_search_terms(paragraph, @search_terms) %>
+       </a>
+       </li>
+      <% end %>
+    <% end %>
+    </ul>
+  <% end %>
+</ul>
+<% else %>
+  <p>Sorry, no matches were found.</p>
+<% end %>
