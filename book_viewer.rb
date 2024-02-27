@@ -1,6 +1,6 @@
 require "tilt/erubis"
 require "sinatra" 
-require "sinatra/reloader"
+require "sinatra/reloader" if development?
 
 before do 
   @chapters = File.readlines("data/toc.txt")
@@ -30,6 +30,7 @@ end
 
 get "/chapters/:number" do
   number = params[:number].split("=").last
+
   redirect "/" unless ("1"..@chapters.size.to_s).include?(number)
 
   @title = "Chapter #{number}: #{@chapters[number.to_i - 1]}"
@@ -41,12 +42,15 @@ end
 
 get "/search" do 
   @search_terms = params[:query] 
+  
   get_results if @search_terms
+
   erb :search
 end
 
 def get_results 
   @results = []
+
   @chapters.each_with_index do |chapter, idx|
     text = File.read("data/chp#{idx + 1}.txt")
     @results << [chapter, idx, text] if text.include?(@search_terms)
